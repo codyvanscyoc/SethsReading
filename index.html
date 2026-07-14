@@ -365,6 +365,54 @@
     box-shadow:0 5px 0 var(--sun-deep);animation:pop .5s;}
   .asteroid.hintglow .rock{border-color:#ffe14b;
     box-shadow:0 0 22px 6px rgba(255,225,75,.85),inset -6px -8px 14px rgba(0,0,0,.5);}
+
+  /* ===================== TABLET / iPad ===================== */
+  /* min-height guard so a phone held sideways keeps its phone layout */
+  @media (min-width:700px) and (min-height:640px){
+    #app{max-width:860px;}
+    .fox{font-size:84px;}
+    .speech{font-size:23px;padding:14px 26px;border-radius:26px;}
+    .word-card{padding:26px 40px;border-radius:32px;margin:12px 0;}
+    .the-word{font-size:clamp(60px,11vw,96px);}
+    .chip{font-size:27px;padding:8px 16px;border-radius:16px;}
+    .choice{font-size:32px;padding:22px 14px;border-radius:26px;}
+    .choice .emoji{font-size:50px;}
+    .helpers{gap:18px;margin-top:18px;}
+    .help-btn{font-size:21px;padding:16px 26px;border-radius:18px;}
+    .the-sentence{font-size:clamp(32px,5.5vw,46px);}
+    .topbar{padding:20px 28px 12px;}
+    .home-btn{width:48px;height:48px;font-size:24px;}
+    .stars{font-size:26px;}
+    .trail-track{height:18px;}
+    .calm-btn{width:66px;height:66px;font-size:32px;right:22px;bottom:22px;}
+    .title-big{font-size:clamp(52px,10vw,72px);}
+    .title-sub{font-size:24px;}
+    .big-btn{font-size:30px;padding:22px 52px;}
+    .level-pick,.space-pick{max-width:440px;}
+    .level-card .lvl-name{font-size:26px;}
+    .level-card .lvl-desc{font-size:16px;}
+    .level-card .lvl-emoji{font-size:44px;}
+  }
+
+  /* iPad LANDSCAPE: two columns so nothing gets cut off in the short height.
+     Word + Fox on the left, answer choices on the right, helpers underneath. */
+  @media (min-width:700px) and (min-height:640px) and (orientation:landscape){
+    #app{max-width:1040px;}
+    .stage{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      column-gap:34px;
+      align-content:center;
+      justify-items:center;
+      padding:8px 34px 14px;
+    }
+    #fox{grid-column:1;grid-row:1;}
+    #speech{grid-column:1;grid-row:2;margin:12px 0 2px;}
+    #wordCard,#sentenceCard{grid-column:1;grid-row:3;width:100%;min-width:0;margin:14px 0 0;}
+    #choices{grid-column:2;grid-row:1 / span 3;align-self:center;margin-top:0;}
+    .stage .helpers{grid-column:1 / -1;grid-row:4;margin-top:18px;}
+    .the-word{font-size:clamp(56px,9vw,92px);}
+  }
 </style>
 </head>
 <body>
