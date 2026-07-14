@@ -22,13 +22,16 @@ Pick a trail and help Fox get home by reading the words. Along the way:
 
 ## Trails (they get harder as you go)
 
-- **Word Trail** — start with *Little Words*, work up to *Big Kid Words*
-- **Blend Trail** — practice blending letter sounds together
-- **Letter Hunt** — find and shoot the right starting letter
-- **Sentence Trail** — read two words, then whole sentences (no pictures)
-- **Space Blast** — an arcade mode: blast the right word out of the sky 🚀
+- **Little Words** → **Blend Trail** → **Big Kid Words** → **Word Explorer**
+- **Challenge Words** 🏆 — bigger "get-ahead" words (dinosaur, mountain, astronaut…)
+- **Sentence Trail** 📖 — read whole sentences
+- **Word Carnival** 🎪 — pop the sliding words to build a sentence, win prize tickets
+- **Space Blast** 🚀 — an arcade mode: blast the right word out of the sky
 
 Get it right and Fox makes it home — 🏡 *"You did it!"*
+
+Words are dealt like a deck — every word is seen before any repeats — and progress
+is saved on the device, so it never starts over.
 
 ## Run it on this computer
 

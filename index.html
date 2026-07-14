@@ -101,11 +101,11 @@
   .word-card{
     background:var(--cream);border-radius:26px;padding:26px 28px;margin:18px 0;
     box-shadow:0 8px 0 rgba(107,68,35,.18),0 12px 30px rgba(0,0,0,.12);
-    border:4px solid #fff;min-width:min(88%,340px);
+    border:4px solid #fff;min-width:min(88%,340px);max-width:min(94%,560px);
   }
   .the-word{
     font-family:'Baloo 2',cursive;font-size:clamp(46px,15vw,72px);font-weight:700;
-    color:var(--moss-dark);letter-spacing:2px;line-height:1;
+    color:var(--moss-dark);letter-spacing:2px;line-height:1;overflow-wrap:anywhere;
   }
   .the-word .lit{color:var(--berry);}
   .sound-out{margin-top:10px;font-size:17px;color:var(--bark);min-height:22px;font-weight:500;}
@@ -129,7 +129,7 @@
     padding:20px 10px;font-family:'Baloo 2',cursive;font-size:26px;font-weight:600;
     color:var(--ink);cursor:pointer;box-shadow:0 5px 0 #f0d488;
     transition:transform .12s,box-shadow .12s;display:flex;flex-direction:column;
-    align-items:center;gap:6px;
+    align-items:center;gap:6px;overflow:hidden;overflow-wrap:anywhere;
   }
   .choice .emoji{font-size:40px;}
   .choice:active{transform:translateY(4px);box-shadow:0 1px 0 #f0d488;}
@@ -149,12 +149,17 @@
   .help-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--sun-deep);}
 
   /* confetti */
-  .confetti{position:absolute;top:-20px;width:12px;height:12px;z-index:5;pointer-events:none;border-radius:2px;}
+  .confetti{position:absolute;top:-20px;width:12px;height:12px;z-index:60;pointer-events:none;border-radius:2px;}
 
   /* screens */
   .screen{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;
     align-items:center;justify-content:center;padding:30px;text-align:center;
     background:linear-gradient(180deg,#d7f0f7,#d9f2dd);}
+  /* the trail list can be taller than the screen — let it scroll, don't clip */
+  #levelScreen{justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding-top:24px;padding-bottom:28px;}
+  #levelScreen .title-big{flex:none;}
+  .level-pick{flex:none;}
   .hidden{display:none;}
 
   .title-big{font-family:'Baloo 2';font-size:clamp(38px,11vw,58px);font-weight:700;
@@ -366,6 +371,79 @@
   .asteroid.hintglow .rock{border-color:#ffe14b;
     box-shadow:0 0 22px 6px rgba(255,225,75,.85),inset -6px -8px 14px rgba(0,0,0,.5);}
 
+  /* ===================== WORD CARNIVAL ===================== */
+  #carnivalScreen{position:absolute;inset:0;z-index:20;display:none;flex-direction:column;
+    overflow:hidden;color:#3a2418;font-family:'Fredoka',sans-serif;
+    background:linear-gradient(180deg,#ffe9c7 0%,#ffd9a0 45%,#ffc785 100%);}
+  #carnivalScreen.show{display:flex;}
+  .tent{position:absolute;top:0;left:0;right:0;height:26px;z-index:2;
+    background:repeating-linear-gradient(90deg,#e8433f 0 26px,#fff 26px 52px);
+    box-shadow:0 3px 8px rgba(0,0,0,.2);}
+  .tent::after{content:"";position:absolute;top:26px;left:0;right:0;height:15px;
+    background:repeating-linear-gradient(90deg,#e8433f 0 26px,#fff 26px 52px);
+    clip-path:polygon(0 0,8.33% 100%,16.66% 0,25% 100%,33.3% 0,41.6% 100%,50% 0,58.3% 100%,66.6% 0,75% 100%,83.3% 0,91.6% 100%,100% 0);}
+  .lights{position:absolute;top:46px;left:8px;right:8px;height:12px;z-index:2;display:flex;
+    justify-content:space-between;align-items:center;pointer-events:none;}
+  .lights i{width:10px;height:10px;border-radius:50%;display:block;animation:blink 1.6s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:.4;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
+
+  .carn-hud{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;
+    gap:8px;padding:66px 18px 4px;}
+  .carn-home{background:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;
+    cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18);color:#c23b1e;}
+  .carn-home:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18);}
+  .carn-tickets{font-size:22px;font-weight:700;color:#c23b1e;display:flex;align-items:center;gap:4px;margin-left:auto;}
+
+  .carn-sign{position:relative;z-index:5;margin:6px 16px 0;background:#fff7e6;
+    border:4px solid #d99a3c;border-radius:20px;padding:14px 16px;min-height:64px;
+    box-shadow:0 6px 0 rgba(160,110,40,.35);display:flex;flex-wrap:wrap;gap:6px 10px;
+    align-items:center;justify-content:center;text-align:center;}
+  .carn-tok{font-family:'Baloo 2',cursive;font-weight:700;font-size:clamp(21px,5.6vw,30px);
+    color:#3a7a57;line-height:1.1;}
+  .carn-tok.blank{color:#c23b1e;border-bottom:5px dotted #e8873f;min-width:1.5em;padding:0 .15em;}
+  .carn-tok.blank.cur{animation:curpulse 1s ease-in-out infinite;}
+  @keyframes curpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.16)}}
+  .carn-tok.pop{animation:tokpop .5s;}
+  @keyframes tokpop{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+
+  .carn-say{position:relative;z-index:5;text-align:center;margin:8px 16px 2px;font-weight:600;
+    color:#8a4b1e;font-size:16px;min-height:22px;}
+  .carn-target{font-family:'Baloo 2',cursive;font-weight:700;color:#c23b1e;}
+
+  .carn-field{position:relative;z-index:4;flex:1;overflow:hidden;margin-top:2px;}
+  .wtile{position:absolute;display:flex;align-items:center;justify-content:center;
+    font-family:'Baloo 2',cursive;font-weight:700;font-size:22px;color:#fff;cursor:pointer;
+    padding:10px 16px;border-radius:16px;white-space:nowrap;user-select:none;
+    background:linear-gradient(180deg,#ff8a3d,#f5661f);border:3px solid #ffd24b;
+    box-shadow:0 4px 0 rgba(150,60,10,.5);text-shadow:0 1px 2px rgba(0,0,0,.35);will-change:left;}
+  .wtile.alt{background:linear-gradient(180deg,#4bb6e8,#2a86c9);border-color:#bff0ff;box-shadow:0 4px 0 rgba(20,80,120,.5);}
+  .wtile.alt2{background:linear-gradient(180deg,#7bc86b,#48a03a);border-color:#e6ffcf;box-shadow:0 4px 0 rgba(30,90,20,.5);}
+  .wtile:active{transform:translateY(3px);}
+  .wtile.hintglow{border-color:#fff;box-shadow:0 4px 0 rgba(150,60,10,.5),0 0 20px 6px #ffe14b;}
+  .wtile.hit{animation:tilehit .3s forwards;}
+  @keyframes tilehit{0%{transform:scale(1)}50%{transform:scale(1.25);filter:brightness(1.7)}100%{transform:scale(0);opacity:0}}
+  .wtile.miss{animation:tilemiss .35s;}
+  @keyframes tilemiss{0%,100%{transform:rotate(0)}25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
+
+  .popper-wrap{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:6;
+    pointer-events:none;display:flex;flex-direction:column;align-items:center;}
+  .popper{font-size:56px;line-height:1;filter:drop-shadow(0 4px 4px rgba(0,0,0,.25));}
+  .popper.recoil{animation:poprecoil .3s ease;}
+  @keyframes poprecoil{0%,100%{transform:translateY(0)}45%{transform:translateY(9px) scale(.95)}}
+  .cork{position:absolute;z-index:7;width:16px;height:16px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle at 35% 30%,#ffe0ad,#c8863c);border:2px solid #8a5a22;box-shadow:0 0 8px rgba(255,180,90,.6);}
+  .booth{position:absolute;left:0;right:0;bottom:0;height:56px;z-index:3;opacity:.9;
+    background:repeating-linear-gradient(90deg,#c23b1e 0 30px,#f3ecd8 30px 60px);border-top:5px solid #8a2a12;}
+
+  .carn-center{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;padding:26px;}
+  .carn-title{font-family:'Baloo 2',cursive;font-weight:700;font-size:clamp(38px,11vw,56px);
+    color:#c23b1e;text-shadow:0 3px 0 #fff;line-height:1.05;margin-bottom:6px;}
+  .carn-btn{background:linear-gradient(180deg,#ffcf4b,#f5a623);border:none;border-radius:22px;
+    padding:18px 44px;font-family:'Baloo 2',cursive;font-weight:700;font-size:24px;color:#7a3b12;
+    cursor:pointer;box-shadow:0 6px 0 #c9781a;margin-top:14px;}
+  .carn-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #c9781a;}
+
   /* ===================== TABLET / iPad ===================== */
   /* min-height guard so a phone held sideways keeps its phone layout */
   @media (min-width:700px) and (min-height:640px){
@@ -454,9 +532,17 @@
         <span class="lvl-emoji">🏔️</span>
         <div><div class="lvl-name">Word Explorer</div><div class="lvl-desc">rabbit, rocket, dragon</div></div>
       </div>
+      <div class="level-card" onclick="startGame('challenge')">
+        <span class="lvl-emoji">🏆</span>
+        <div><div class="lvl-name">Challenge Words</div><div class="lvl-desc">dinosaur, mountain, astronaut</div></div>
+      </div>
       <div class="level-card" onclick="startGame('sentence')">
         <span class="lvl-emoji">📖</span>
         <div><div class="lvl-name">Sentence Trail</div><div class="lvl-desc">Read a whole sentence!</div></div>
+      </div>
+      <div class="level-card" onclick="openCarnival()" style="background:linear-gradient(180deg,#ff5a7a,#ff8a3d);border-color:#ffd24b;">
+        <span class="lvl-emoji">🎪</span>
+        <div><div class="lvl-name" style="color:#fff;">Word Carnival</div><div class="lvl-desc" style="color:#fff3d6;">Pop words to build a sentence!</div></div>
       </div>
       <div class="level-card" onclick="openSpace()" style="background:linear-gradient(180deg,#2a1a5e,#160d38);border-color:#5b7bff;">
         <span class="lvl-emoji">🚀</span>
@@ -631,6 +717,34 @@
       </div>
     </div>
   </div>
+
+  <!-- ================= WORD CARNIVAL ================= -->
+  <div id="carnivalScreen">
+    <div class="tent"></div>
+    <div class="lights" id="carnLights"></div>
+
+    <!-- menu -->
+    <div class="carn-center" id="carnMenu">
+      <div style="font-size:74px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.2));">🎪</div>
+      <div class="carn-title">Word Carnival</div>
+      <div style="color:#8a4b1e;font-size:18px;margin-bottom:2px;font-weight:600;max-width:300px;">Pop the right words to build a whole sentence!</div>
+      <button class="carn-btn" onclick="startCarnival()">Play! 🎟️</button>
+      <button class="carn-btn" style="margin-top:14px;background:rgba(255,255,255,.75);color:#8a4b1e;box-shadow:0 6px 0 rgba(160,110,40,.4);" onclick="closeCarnival()">← Back</button>
+    </div>
+
+    <!-- gameplay -->
+    <div class="carn-hud" id="carnHud" style="display:none;">
+      <button class="carn-home" onclick="closeCarnival()">🏠</button>
+      <button class="carn-home" onclick="toggleFullscreen()" title="Full screen">⛶</button>
+      <div class="carn-tickets">🎟️<span id="carnTickets">0</span></div>
+    </div>
+    <div class="carn-sign" id="carnSign" style="display:none;"></div>
+    <div class="carn-say" id="carnSay" style="display:none;">Find the word: <span class="carn-target" id="carnTarget"></span></div>
+    <div class="carn-field" id="carnField" style="display:none;">
+      <div class="popper-wrap" id="popperWrap"><div class="popper" id="popper">🦊</div></div>
+    </div>
+    <div class="booth" id="carnBooth" style="display:none;"></div>
+  </div>
 </div>
 
 <script>
@@ -695,6 +809,26 @@ const WORDS = {
     {w:"rose",e:"🌹",sounds:["r","o","se"]},
     {w:"seal",e:"🦭",sounds:["s","ea","l"]},
     {w:"soap",e:"🧼",sounds:["s","oa","p"]},
+    {w:"ball",e:"⚽",sounds:["b","a","ll"]},
+    {w:"boat",e:"⛵",sounds:["b","oa","t"]},
+    {w:"goat",e:"🐐",sounds:["g","oa","t"]},
+    {w:"coat",e:"🧥",sounds:["c","oa","t"]},
+    {w:"road",e:"🛣️",sounds:["r","oa","d"]},
+    {w:"rope",e:"🪢",sounds:["r","o","pe"]},
+    {w:"nail",e:"💅",sounds:["n","ai","l"]},
+    {w:"tie",e:"👔",sounds:["t","ie"]},
+    {w:"saw",e:"🪚",sounds:["s","aw"]},
+    {w:"jar",e:"🫙",sounds:["j","ar"]},
+    {w:"net",e:"🥅",sounds:["n","e","t"]},
+    {w:"tea",e:"🍵",sounds:["t","ea"]},
+    {w:"paw",e:"🐾",sounds:["p","aw"]},
+    {w:"lock",e:"🔒",sounds:["l","o","ck"]},
+    {w:"dice",e:"🎲",sounds:["d","i","ce"]},
+    {w:"gem",e:"💎",sounds:["g","e","m"]},
+    {w:"pin",e:"📌",sounds:["p","i","n"]},
+    {w:"gate",e:"🚪",sounds:["g","a","te"]},
+    {w:"crib",e:"🛏️",sounds:["cr","i","b"]},
+    {w:"vet",e:"🩺",sounds:["v","e","t"]},
   ],
   blend:[
     {w:"frog",e:"🐸",sounds:["fr","o","g"]},
@@ -755,6 +889,26 @@ const WORDS = {
     {w:"swing",e:"🛝",sounds:["sw","i","ng"]},
     {w:"thorn",e:"🌵",sounds:["th","or","n"]},
     {w:"wave",e:"🌊",sounds:["w","a","ve"]},
+    {w:"sky",e:"🌌",sounds:["sk","y"]},
+    {w:"spray",e:"💦",sounds:["spr","ay"]},
+    {w:"street",e:"🛣️",sounds:["str","ee","t"]},
+    {w:"straw",e:"🥤",sounds:["str","aw"]},
+    {w:"spring",e:"🌸",sounds:["spr","i","ng"]},
+    {w:"throne",e:"👑",sounds:["thr","o","ne"]},
+    {w:"three",e:"3️⃣",sounds:["thr","ee"]},
+    {w:"scream",e:"😱",sounds:["scr","ea","m"]},
+    {w:"splash",e:"💦",sounds:["spl","a","sh"]},
+    {w:"sprout",e:"🌱",sounds:["spr","ou","t"]},
+    {w:"branch",e:"🌿",sounds:["br","a","nch"]},
+    {w:"bridge",e:"🌉",sounds:["br","i","dge"]},
+    {w:"flour",e:"🌾",sounds:["fl","our"]},
+    {w:"grill",e:"🍖",sounds:["gr","i","ll"]},
+    {w:"prize",e:"🏆",sounds:["pr","i","ze"]},
+    {w:"queen",e:"👸",sounds:["qu","ee","n"]},
+    {w:"quilt",e:"🧵",sounds:["qu","i","lt"]},
+    {w:"twist",e:"🌀",sounds:["tw","i","st"]},
+    {w:"skunk",e:"🦨",sounds:["sk","u","nk"]},
+    {w:"swan",e:"🦢",sounds:["sw","a","n"]},
   ],
   sight:[
     {w:"what",e:"❓",sounds:["wh","a","t"]},
@@ -817,6 +971,25 @@ const WORDS = {
     {w:"wind",e:"🍃",sounds:["w","i","nd"]},
     {w:"wish",e:"🌟",sounds:["w","i","sh"]},
     {w:"yell",e:"📣",sounds:["y","e","ll"]},
+    {w:"gave",e:"🎁",sounds:["g","a","ve"]},
+    {w:"more",e:"➕",sounds:["m","ore"]},
+    {w:"most",e:"🥇",sounds:["m","o","st"]},
+    {w:"must",e:"✅",sounds:["m","u","st"]},
+    {w:"next",e:"⏭️",sounds:["n","e","xt"]},
+    {w:"pull",e:"🪢",sounds:["p","u","ll"]},
+    {w:"push",e:"🚪",sounds:["p","u","sh"]},
+    {w:"same",e:"🟰",sounds:["s","a","me"]},
+    {w:"show",e:"🎭",sounds:["sh","ow"]},
+    {w:"team",e:"👥",sounds:["t","ea","m"]},
+    {w:"then",e:"➡️",sounds:["th","e","n"]},
+    {w:"went",e:"🚶",sounds:["w","e","nt"]},
+    {w:"when",e:"⏰",sounds:["wh","e","n"]},
+    {w:"work",e:"🛠️",sounds:["w","or","k"]},
+    {w:"year",e:"📅",sounds:["y","ear"]},
+    {w:"night",e:"🌙",sounds:["n","igh","t"]},
+    {w:"light",e:"💡",sounds:["l","igh","t"]},
+    {w:"first",e:"🥇",sounds:["f","ir","st"]},
+    {w:"green",e:"🟢",sounds:["gr","ee","n"]},
   ],
   explorer:[
     {w:"rabbit",e:"🐰",sounds:["rab","bit"]},
@@ -877,6 +1050,60 @@ const WORDS = {
     {w:"spider",e:"🕷️",sounds:["spi","der"]},
     {w:"tulip",e:"🌷",sounds:["tu","lip"]},
     {w:"zebra",e:"🦓",sounds:["ze","bra"]},
+    {w:"pretzel",e:"🥨",sounds:["pret","zel"]},
+    {w:"popcorn",e:"🍿",sounds:["pop","corn"]},
+    {w:"balloon",e:"🎈",sounds:["ba","lloon"]},
+    {w:"tickets",e:"🎟️",sounds:["tick","ets"]},
+    {w:"circus",e:"🎪",sounds:["cir","cus"]},
+    {w:"planet",e:"🪐",sounds:["plan","et"]},
+    {w:"comet",e:"☄️",sounds:["com","et"]},
+    {w:"cactus",e:"🌵",sounds:["cac","tus"]},
+    {w:"iguana",e:"🦎",sounds:["i","gua","na"]},
+    {w:"walrus",e:"🦭",sounds:["wal","rus"]},
+    {w:"llama",e:"🦙",sounds:["lla","ma"]},
+    {w:"panda",e:"🐼",sounds:["pan","da"]},
+    {w:"beetle",e:"🪲",sounds:["bee","tle"]},
+    {w:"pigeon",e:"🐦",sounds:["pi","geon"]},
+    {w:"tomato",e:"🍅",sounds:["to","ma","to"]},
+    {w:"banana",e:"🍌",sounds:["ba","na","na"]}
+  ],
+  challenge:[
+    {w:"dinosaur",e:"🦕",sounds:["di","no","saur"]},
+    {w:"butterfly",e:"🦋",sounds:["but","ter","fly"]},
+    {w:"elephant",e:"🐘",sounds:["el","e","phant"]},
+    {w:"octopus",e:"🐙",sounds:["oc","to","pus"]},
+    {w:"kangaroo",e:"🦘",sounds:["kan","ga","roo"]},
+    {w:"alligator",e:"🐊",sounds:["al","li","ga","tor"]},
+    {w:"astronaut",e:"🧑‍🚀",sounds:["as","tro","naut"]},
+    {w:"telescope",e:"🔭",sounds:["tel","e","scope"]},
+    {w:"volcano",e:"🌋",sounds:["vol","ca","no"]},
+    {w:"mountain",e:"⛰️",sounds:["moun","tain"]},
+    {w:"umbrella",e:"☂️",sounds:["um","brel","la"]},
+    {w:"computer",e:"💻",sounds:["com","pu","ter"]},
+    {w:"hospital",e:"🏥",sounds:["hos","pi","tal"]},
+    {w:"hamburger",e:"🍔",sounds:["ham","bur","ger"]},
+    {w:"strawberry",e:"🍓",sounds:["straw","ber","ry"]},
+    {w:"watermelon",e:"🍉",sounds:["wa","ter","mel","on"]},
+    {w:"pineapple",e:"🍍",sounds:["pine","ap","ple"]},
+    {w:"crocodile",e:"🐊",sounds:["croc","o","dile"]},
+    {w:"tornado",e:"🌪️",sounds:["tor","na","do"]},
+    {w:"skeleton",e:"💀",sounds:["skel","e","ton"]},
+    {w:"triangle",e:"📐",sounds:["tri","an","gle"]},
+    {w:"envelope",e:"✉️",sounds:["en","ve","lope"]},
+    {w:"calendar",e:"📅",sounds:["cal","en","dar"]},
+    {w:"telephone",e:"☎️",sounds:["tel","e","phone"]},
+    {w:"microscope",e:"🔬",sounds:["mi","cro","scope"]},
+    {w:"helicopter",e:"🚁",sounds:["hel","i","cop","ter"]},
+    {w:"caterpillar",e:"🐛",sounds:["cat","er","pil","lar"]},
+    {w:"parachute",e:"🪂",sounds:["par","a","chute"]},
+    {w:"pyramid",e:"🔺",sounds:["pyr","a","mid"]},
+    {w:"treasure",e:"💰",sounds:["treas","ure"]},
+    {w:"lightning",e:"⚡",sounds:["light","ning"]},
+    {w:"snowman",e:"⛄",sounds:["snow","man"]},
+    {w:"scarecrow",e:"🌾",sounds:["scare","crow"]},
+    {w:"waterfall",e:"🏞️",sounds:["wa","ter","fall"]},
+    {w:"submarine",e:"🚢",sounds:["sub","ma","rine"]},
+    {w:"orchestra",e:"🎻",sounds:["or","ches","tra"]}
   ]
 };
 
@@ -940,6 +1167,57 @@ const PHRASES=[
   "run and jump","she can run","he is big","we can go","it is hot","the dog ran"
 ];
 
+/* ---------- HARDER READING WORDS (no pictures) ---------- */
+/* High-frequency + "get ahead" vocabulary. Used as carnival distractors and
+   as an extra reading pool so he keeps meeting new, bigger words. */
+const ADVANCED=[
+  "because","people","friend","water","would","could","should","school","animal","family",
+  "morning","together","another","around","before","between","different","important","beautiful",
+  "favorite","remember","suddenly","carefully","adventure","dangerous","enormous","delicious",
+  "invisible","gigantic","curious","gentle","brave","clever","quiet","early","often","always",
+  "never","almost","really","today","tomorrow","under","over","behind","myself","something",
+  "everyone","country","river","ocean","forest","planet","science","number","letter","question",
+  "answer","sentence","story","picture","color","world","house","water","light","strong"
+];
+
+/* ---------- WORD CARNIVAL SENTENCE BANK ---------- */
+/* Each sentence is a list of tokens. Tokens with p:1 are the ones he shoots
+   (in order); the rest are placed for him. Builds a full sentence, word by word. */
+const CARNIVAL=[
+  {t:[{w:"The"},{w:"cat",p:1},{w:"can"},{w:"jump",p:1}]},
+  {t:[{w:"A"},{w:"big",p:1},{w:"dog",p:1},{w:"ran"}]},
+  {t:[{w:"The"},{w:"sun",p:1},{w:"is"},{w:"hot",p:1}]},
+  {t:[{w:"We"},{w:"see"},{w:"a"},{w:"frog",p:1}]},
+  {t:[{w:"The"},{w:"fish",p:1},{w:"can"},{w:"swim",p:1}]},
+  {t:[{w:"The"},{w:"bird",p:1},{w:"can"},{w:"fly",p:1}]},
+  {t:[{w:"A"},{w:"star",p:1},{w:"is"},{w:"up"},{w:"high",p:1}]},
+  {t:[{w:"The"},{w:"bug",p:1},{w:"is"},{w:"red",p:1}]},
+  {t:[{w:"We"},{w:"ride"},{w:"the"},{w:"bus",p:1}]},
+  {t:[{w:"The"},{w:"cow",p:1},{w:"eats"},{w:"grass",p:1}]},
+  {t:[{w:"My"},{w:"dad",p:1},{w:"is"},{w:"tall",p:1}]},
+  {t:[{w:"The"},{w:"duck",p:1},{w:"is"},{w:"in"},{w:"the"},{w:"pond",p:1}]},
+  {t:[{w:"A"},{w:"snake",p:1},{w:"can"},{w:"hiss",p:1}]},
+  {t:[{w:"The"},{w:"moon",p:1},{w:"is"},{w:"out"},{w:"at"},{w:"night",p:1}]},
+  {t:[{w:"We"},{w:"play",p:1},{w:"in"},{w:"the"},{w:"park",p:1}]},
+  {t:[{w:"The"},{w:"king",p:1},{w:"has"},{w:"gold",p:1}]},
+  {t:[{w:"I"},{w:"read",p:1},{w:"a"},{w:"good"},{w:"book",p:1}]},
+  {t:[{w:"The"},{w:"rain",p:1},{w:"is"},{w:"cold",p:1}]},
+  {t:[{w:"A"},{w:"bee",p:1},{w:"can"},{w:"sting",p:1}]},
+  {t:[{w:"The"},{w:"train",p:1},{w:"is"},{w:"fast",p:1}]},
+  {t:[{w:"We"},{w:"bake",p:1},{w:"a"},{w:"cake",p:1}]},
+  {t:[{w:"The"},{w:"pig",p:1},{w:"is"},{w:"pink",p:1}]},
+  {t:[{w:"My"},{w:"dog",p:1},{w:"is"},{w:"my"},{w:"best"},{w:"friend",p:1}]},
+  {t:[{w:"The"},{w:"fox",p:1},{w:"is"},{w:"in"},{w:"the"},{w:"den",p:1}]},
+  {t:[{w:"A"},{w:"seed",p:1},{w:"can"},{w:"grow",p:1}]},
+  {t:[{w:"The"},{w:"kite",p:1},{w:"flies"},{w:"in"},{w:"the"},{w:"wind",p:1}]},
+  {t:[{w:"We"},{w:"jump",p:1},{w:"in"},{w:"the"},{w:"mud",p:1}]},
+  {t:[{w:"The"},{w:"lion",p:1},{w:"can"},{w:"roar",p:1}]},
+  {t:[{w:"I"},{w:"love",p:1},{w:"to"},{w:"run",p:1}]},
+  {t:[{w:"The"},{w:"ship",p:1},{w:"sails"},{w:"on"},{w:"the"},{w:"sea",p:1}]},
+  {t:[{w:"A"},{w:"frog",p:1},{w:"sat"},{w:"on"},{w:"a"},{w:"log",p:1}]},
+  {t:[{w:"The"},{w:"baby",p:1},{w:"can"},{w:"nap",p:1}]},
+];
+
 /* Effort / process praise — praises what he DID (tried, sounded it out, kept going),
    not "you're smart". Protects a kid who's scared of being "bad at reading". */
 const CHEERS=["You sounded it out!","You didn't give up!","You worked hard!","Great trying!","You kept going!","Nice sounding out!","You did the hard part!","Way to stick with it!","You read it yourself!","Brave reading, buddy!"];
@@ -951,6 +1229,34 @@ const ROUNDS=8;
 let level="short", pool=[], current=null, roundNum=0, stars=0, locked=false;
 let isSentence=false, currentSentence=null;
 let wrongTries=0, missStreak=0;   // per-round tries + rough-patch counter for the breathing nudge
+
+/* ============================================================
+   MEMORY — saved on the device so progress isn't lost between plays.
+   The "deck" deals every word once before any repeat, and remembers
+   where it left off, so words don't restart or repeat too much.
+   ============================================================ */
+function lsGet(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+// Draw the next unique id from a persistent shuffled deck for `key`.
+// items = array of unique strings. Reshuffles (and keeps going) once exhausted.
+function drawCard(key,items){
+  const K="deck_"+key;
+  let deck=lsGet(K,null);
+  const valid = deck && Array.isArray(deck.order) && deck.n===items.length;
+  if(!valid){ deck={order:shuffle([...items]), pos:0, n:items.length}; }
+  if(deck.pos>=deck.order.length){ deck.order=shuffle([...items]); deck.pos=0; }
+  let id=deck.order[deck.pos]; deck.pos++;
+  if(!items.includes(id)){ id=items[Math.floor(Math.random()*items.length)]; } // dict changed safety
+  lsSet(K,deck);
+  return id;
+}
+// Draw the next word OBJECT for a picture-trail level, cycling the whole tier.
+function drawWord(lvl){
+  const list=WORDS[lvl];
+  const w=drawCard("trail_"+lvl, list.map(x=>x.w));
+  return list.find(x=>x.w===w) || list[Math.floor(Math.random()*list.length)];
+}
 
 /* ---------- FLOW ---------- */
 function chooseLevel(){
@@ -979,13 +1285,13 @@ function nextRound(){
   locked=false; wrongTries=0;
   document.getElementById("calmBtn").classList.remove("pulse");
   if(roundNum>=ROUNDS){ return finish(); }
-  if(pool.length<4){ pool=shuffle([...WORDS[level]]); }
-  current=pool.shift();
+  current=drawWord(level);           // deck: cycles the whole tier, remembers across plays
   roundNum++;
 
   // set word
   const wordEl=document.getElementById("theWord");
   wordEl.textContent=current.w;
+  fitWord();                         // shrink long words (e.g. "watermelon") to fit the card
   // try-first: invite HIM to read before we ever say the word for him
   document.getElementById("speech").textContent=pick(["Your turn — sound it out!","Can you read this word?","Give it a try! Tap the sounds.","Read it out loud!"]);
   // show the word broken into tappable sound chips (multisensory scaffold)
@@ -1000,11 +1306,41 @@ function nextRound(){
     const b=document.createElement("button");
     b.className="choice";
     b.innerHTML=`<span class="emoji">${o.e}</span>${o.w}`;
+    b.style.fontSize=choiceFont(o.w);
     if(o.w===current.w) b.dataset.correct="1";
     b.onclick=()=>answer(b,o);
     box.appendChild(b);
   });
   // NOTE: we intentionally do NOT auto-say the word — he tries first, help is one tap away.
+}
+
+/* size the word so a long word fits on one line within the card.
+   Deterministic (based on length), so it's immune to web-font load timing —
+   measuring live text can misfire before Baloo finishes loading. */
+function fitWord(){
+  const el=document.getElementById("theWord");
+  const stage=document.getElementById("stage");
+  el.style.whiteSpace="nowrap";
+  el.style.fontSize="";                        // read the natural (CSS) size as the cap
+  const cssMax=parseFloat(getComputedStyle(el).fontSize)||58;
+  // actual space inside the word card: stage padding (20 each side),
+  // card max-width (94%, cap 560), card padding (28 each side) + border (4 each)
+  const stageInner=(stage.clientWidth||360)-40;
+  const cardInner=Math.min(stageInner*0.94,560)-64;
+  const avail=cardInner*0.98;                   // small safety margin
+  const len=Math.max(1,(el.textContent||"").length);
+  // Baloo 2 bold ≈ 0.62em per char + 2px letter-spacing
+  let fs=(avail - len*2)/(len*0.62);
+  fs=Math.max(22, Math.min(fs, cssMax));
+  el.style.fontSize=fs+"px";
+}
+/* pick a choice-button font size so long words don't overflow the button */
+function choiceFont(w){
+  const n=(w||"").length;
+  if(n>=10) return "17px";
+  if(n>=8)  return "20px";
+  if(n>=7)  return "22px";
+  return "";                                   // let CSS decide for short words
 }
 
 /* render each sound of the word as a tappable chip; tapping says just that sound */
@@ -1028,8 +1364,8 @@ function nextSentenceRound(){
   locked=false; wrongTries=0;
   document.getElementById("calmBtn").classList.remove("pulse");
   if(roundNum>=ROUNDS){ return finish(); }
-  if(pool.length<1){ pool=shuffle([...SENTENCES]); }
-  currentSentence=pool.shift();
+  const si=parseInt(drawCard("sentences",SENTENCES.map((s,i)=>String(i))),10);
+  currentSentence=SENTENCES[si];     // deck: cycles all sentences, remembers across plays
   roundNum++;
 
   // render sentence with a blank where the word goes
@@ -1047,6 +1383,7 @@ function nextSentenceRound(){
     const b=document.createElement("button");
     b.className="choice";
     b.innerHTML=`<span class="emoji">${o.e}</span>${o.answer}`;
+    b.style.fontSize=choiceFont(o.answer);
     if(o.answer===currentSentence.answer) b.dataset.correct="1";
     b.onclick=()=>answerSentence(b,o);
     box.appendChild(b);
@@ -1244,7 +1581,8 @@ function burstConfetti(){makeConfetti(16);}
 function bigConfetti(){makeConfetti(50);}
 function makeConfetti(n){
   const colors=["#ffc94b","#e56b6f","#8fd694","#3b7a57","#f5a623","#bfe6f0"];
-  const app=document.getElementById("app");
+  // drop confetti onto whichever overlay is showing, so it's not hidden behind it
+  const app=document.querySelector("#carnivalScreen.show, #spaceScreen.show")||document.getElementById("app");
   for(let i=0;i<n;i++){
     const c=document.createElement("div");
     c.className="confetti";
@@ -1642,6 +1980,226 @@ function respawnSpaceMenu(){
     </div>
     <button class="space-btn" style="margin-top:18px;background:rgba(255,255,255,.12);color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.3);" onclick="closeSpace()">← Back</button>
   `;
+}
+
+/* ============================================================
+   WORD CARNIVAL — pop sliding words to build a sentence, word by word.
+   Endless & gentle like Space. Tickets persist across plays.
+   ============================================================ */
+let carnTickets=0, carnLocked=false, carnRAF=null, carnLastT=0;
+let carnTiles=[], carnSentence=null, carnTokenEls=[], carnTargetIdx=-1;
+let carnMiss=0, carnFactor=0.95, carnLightsBuilt=false;
+
+function openCarnival(){
+  hide("levelScreen");
+  buildCarnLights();
+  document.getElementById("carnMenu").style.display="flex";
+  ["carnHud","carnSign","carnSay","carnField","carnBooth"].forEach(id=>document.getElementById(id).style.display="none");
+  document.getElementById("carnivalScreen").classList.add("show");
+}
+function closeCarnival(){
+  stopCarnLoop(); clearCarnTiles();
+  document.getElementById("carnivalScreen").classList.remove("show");
+  showOnly("levelScreen");
+}
+function buildCarnLights(){
+  if(carnLightsBuilt) return;
+  const box=document.getElementById("carnLights");
+  const cols=["#ffe14b","#ff5a7a","#5ad1ff","#8fe08f","#ffb14b","#c56bff"];
+  for(let i=0;i<14;i++){
+    const l=document.createElement("i");
+    l.style.background=cols[i%cols.length];
+    l.style.animationDelay=(i*0.11)+"s";
+    box.appendChild(l);
+  }
+  carnLightsBuilt=true;
+}
+
+function startCarnival(){
+  carnTickets=lsGet("carn_tickets",0);   // keep his prize tickets across plays
+  document.getElementById("carnTickets").textContent=carnTickets;
+  carnLocked=false; carnFactor=0.95;
+  document.getElementById("carnMenu").style.display="none";
+  document.getElementById("carnHud").style.display="flex";
+  document.getElementById("carnSign").style.display="flex";
+  document.getElementById("carnSay").style.display="block";
+  document.getElementById("carnField").style.display="block";
+  document.getElementById("carnBooth").style.display="block";
+  nextCarnSentence();
+}
+
+function nextCarnSentence(){
+  clearCarnTiles();
+  const idx=parseInt(drawCard("carnival",CARNIVAL.map((s,i)=>String(i))),10);
+  carnSentence=CARNIVAL[idx];
+  carnSentence.t.forEach(tok=>tok._done=false);   // reset shared data
+  carnTargetIdx=-1;
+  renderCarnSign();
+  advanceCarnTarget();
+}
+
+function renderCarnSign(){
+  const sign=document.getElementById("carnSign");
+  sign.innerHTML="";
+  carnTokenEls=[];
+  carnSentence.t.forEach(tok=>{
+    const s=document.createElement("span");
+    if(tok.p && !tok._done){ s.className="carn-tok blank"; s.textContent="___"; }
+    else { s.className="carn-tok"; s.textContent=tok.w; }
+    sign.appendChild(s);
+    carnTokenEls.push(s);
+  });
+}
+
+function advanceCarnTarget(){
+  carnLocked=false; carnMiss=0;
+  let next=-1;
+  for(let i=0;i<carnSentence.t.length;i++){
+    if(carnSentence.t[i].p && !carnSentence.t[i]._done){ next=i; break; }
+  }
+  if(next===-1){ return carnSentenceDone(); }
+  carnTargetIdx=next;
+  const targetWord=carnSentence.t[next].w;
+  document.getElementById("carnSay").innerHTML='Find the word: <span class="carn-target">'+targetWord+'</span>';
+  carnTokenEls.forEach((el,i)=>el.classList.toggle("cur", i===next && el.classList.contains("blank")));
+  spawnCarnTiles(targetWord);
+  setTimeout(()=>{ if(!carnLocked) speak(targetWord); },350);
+}
+
+function buildCarnDistractors(target){
+  const pool=new Set();
+  carnSentence.t.forEach(tok=>{ if(tok.p && tok.w!==target) pool.add(tok.w); });
+  const extra=shuffle([...WORDS.short.map(x=>x.w),...WORDS.sight.map(x=>x.w),...ADVANCED]);
+  for(const w of extra){
+    if(w!==target && Math.abs(w.length-target.length)<=3) pool.add(w);
+    if(pool.size>=10) break;
+  }
+  return [...pool].filter(w=>w!==target);
+}
+
+function spawnCarnTiles(targetWord){
+  clearCarnTiles();
+  const field=document.getElementById("carnField");
+  const W=field.clientWidth||360, H=field.clientHeight||420;
+  const others=shuffle(buildCarnDistractors(targetWord)).slice(0,3);
+  const words=shuffle([targetWord,...others]);
+  const laneCount=words.length;       // one lane per word → always visible, never overlaps
+  const usableH=H-64;                 // leave room for the popper/booth
+  const laneH=usableH/laneCount;      // spread the lanes down the whole field
+  const topPad=10;
+  words.forEach((w,i)=>{
+    const lane=i;
+    const dir=(lane%2===0)?1:-1;
+    const el=document.createElement("div");
+    el.className="wtile"+(lane%3===1?" alt":lane%3===2?" alt2":"");
+    el.textContent=w;
+    field.appendChild(el);
+    const tw=el.offsetWidth||90, th=el.offsetHeight||44;
+    el._w=tw; el._dir=dir;
+    el._y=topPad + lane*laneH + (laneH-th)/2;
+    el.style.top=el._y+"px";
+    // start spread ACROSS the field so every tile is visible right away, then wraps
+    el._x=Math.max(4,Math.min(W-tw-4,(W/words.length)*i + Math.random()*18));
+    el.style.left=el._x+"px";
+    el._speed=0.055+Math.random()*0.03;
+    el._correct=(w===targetWord);
+    el.addEventListener("click",()=>carnShoot(el));
+    carnTiles.push(el);
+  });
+  startCarnLoop();
+}
+
+function startCarnLoop(){
+  stopCarnLoop();
+  carnLastT=performance.now();
+  const field=document.getElementById("carnField");
+  const step=(t)=>{
+    const dt=Math.min(50,t-carnLastT); carnLastT=t;
+    const W=field.clientWidth||360;
+    for(const el of carnTiles){
+      if(el._dead) continue;
+      el._x += el._dir*el._speed*dt*carnFactor;
+      if(el._dir>0 && el._x>W+20){ el._x=-el._w-20; }
+      else if(el._dir<0 && el._x<-el._w-20){ el._x=W+20; }
+      el.style.left=el._x+"px";
+    }
+    carnRAF=requestAnimationFrame(step);
+  };
+  carnRAF=requestAnimationFrame(step);
+}
+function stopCarnLoop(){ if(carnRAF){cancelAnimationFrame(carnRAF);carnRAF=null;} }
+function clearCarnTiles(){
+  carnTiles.forEach(t=>t.remove()); carnTiles=[];
+  document.querySelectorAll('.cork').forEach(c=>c.remove());
+}
+
+function carnShoot(el){
+  if(carnLocked || el._dead) return;
+  if(el._correct){
+    carnLocked=true;
+    tossCork(el,()=>popCarnTile(el));
+  }else{
+    carnMiss++;
+    carnFactor=Math.max(0.5,carnFactor-0.15);
+    el.classList.add("miss"); setTimeout(()=>el.classList.remove("miss"),350);
+    const tw=carnSentence.t[carnTargetIdx].w;
+    document.getElementById("carnSay").innerHTML='Not that one — find <span class="carn-target">'+tw+'</span>';
+    speak(tw);
+    if(carnMiss>=3){ const g=carnTiles.find(x=>x._correct&&!x._dead); if(g) g.classList.add("hintglow"); }
+    recoilPopper();
+  }
+}
+
+function tossCork(el,cb){
+  recoilPopper();
+  const field=document.getElementById("carnField");
+  const pop=document.getElementById("popperWrap");
+  const fRect=field.getBoundingClientRect();
+  const pRect=pop.getBoundingClientRect();
+  const eRect=el.getBoundingClientRect();
+  const x1=pRect.left+pRect.width/2-fRect.left, y1=pRect.top-fRect.top;
+  const x2=eRect.left+eRect.width/2-fRect.left, y2=eRect.top+eRect.height/2-fRect.top;
+  const cork=document.createElement("div");
+  cork.className="cork";
+  cork.style.left=x1+"px"; cork.style.top=y1+"px";
+  field.appendChild(cork);
+  cork.animate([{transform:"translate(-50%,-50%)"},{transform:`translate(${x2-x1}px,${y2-y1}px)`}],
+    {duration:220,easing:"ease-out"});
+  setTimeout(()=>{ cork.remove(); cb(); },230);
+}
+
+function popCarnTile(el){
+  el._dead=true; el.classList.add("hit");
+  setTimeout(()=>el.remove(),300);
+  // remove the other tiles now; keep the popped one for its animation
+  carnTiles.forEach(t=>{ if(t!==el){ t._dead=true; t.remove(); } });
+  carnTiles=[el];
+  const tok=carnSentence.t[carnTargetIdx];
+  tok._done=true;
+  const te=carnTokenEls[carnTargetIdx];
+  te.className="carn-tok pop"; te.textContent=tok.w;
+  document.getElementById("carnSay").textContent=pick(["Nice pop! 🎉","Got it! 🎯","Yes! 🎪","Boom! 🎈"]);
+  speak(tok.w);
+  setTimeout(advanceCarnTarget,950);
+}
+
+function carnSentenceDone(){
+  stopCarnLoop(); clearCarnTiles();
+  carnTickets++; lsSet("carn_tickets",carnTickets);
+  document.getElementById("carnTickets").textContent=carnTickets;
+  const full=carnSentence.t.map(x=>x.w).join(" ");
+  document.getElementById("carnSay").textContent="🎉 You built it! +1 ticket 🎟️";
+  speak(full);
+  bigConfetti();
+  carnFactor=Math.min(1.15,carnFactor+0.1);
+  setTimeout(nextCarnSentence,2300);
+}
+
+function recoilPopper(){
+  const p=document.getElementById("popper");
+  if(!p)return;
+  p.classList.remove("recoil");void p.offsetWidth;p.classList.add("recoil");
+  setTimeout(()=>p.classList.remove("recoil"),300);
 }
 
 /* ---------- UTIL ---------- */
