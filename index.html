@@ -320,6 +320,51 @@
     border-radius:50%;background:#fff;transition:transform .2s;}
   .emoji-toggle.off .pill{background:rgba(255,255,255,.25);}
   .emoji-toggle.off .pill::after{transform:translateX(20px);}
+
+  /* ===== tappable sound chips (blend-it) ===== */
+  .sound-out{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;min-height:44px;}
+  .chip{display:inline-block;font-family:'Baloo 2',cursive;font-weight:700;font-size:22px;
+    color:var(--moss-dark);background:#fff;border:3px solid #ffe4a0;border-radius:14px;
+    padding:6px 12px;cursor:pointer;box-shadow:0 3px 0 #f0d488;line-height:1;
+    transition:transform .1s,background .15s,box-shadow .1s;}
+  .chip:active{transform:translateY(2px);box-shadow:0 1px 0 #f0d488;}
+  .chip.lit{background:var(--sun);border-color:var(--sun-deep);color:var(--ink);
+    transform:translateY(-3px) scale(1.1);box-shadow:0 5px 0 var(--sun-deep);}
+  .chip.arrow{border:none;box-shadow:none;background:transparent;color:var(--bark);
+    padding:6px 0;cursor:default;font-size:18px;opacity:.6;}
+
+  /* ===== calm corner ===== */
+  .calm-btn{position:absolute;right:14px;bottom:16px;z-index:12;
+    background:#fff;border:none;border-radius:50%;width:52px;height:52px;
+    font-size:26px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.14);}
+  .calm-btn.hidden{display:none;}
+  .calm-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.14);}
+  .calm-btn.pulse{animation:calmpulse 1.2s ease-in-out infinite;}
+  @keyframes calmpulse{0%,100%{transform:scale(1);box-shadow:0 3px 0 rgba(0,0,0,.12);}
+    50%{transform:scale(1.14);box-shadow:0 0 18px rgba(90,180,220,.95);}}
+
+  #calmScreen{position:absolute;inset:0;z-index:40;display:none;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;padding:30px;color:#eaf6ff;
+    background:radial-gradient(ellipse at 50% 35%,#3a6b8c 0%,#22506e 45%,#143247 100%);}
+  #calmScreen.show{display:flex;}
+  .breathe-ring{width:150px;height:150px;border-radius:50%;
+    background:radial-gradient(circle,rgba(191,240,255,.33),rgba(92,198,242,.27));
+    border:4px solid rgba(191,240,255,.7);display:flex;align-items:center;justify-content:center;
+    font-size:58px;animation:breathe 8s ease-in-out infinite;box-shadow:0 0 44px rgba(120,200,255,.4);}
+  @keyframes breathe{0%{transform:scale(.72);}45%{transform:scale(1.28);}55%{transform:scale(1.28);}100%{transform:scale(.72);}}
+  .breathe-word{font-family:'Baloo 2',cursive;font-weight:700;font-size:30px;margin-top:30px;
+    min-height:38px;color:#eaf6ff;text-shadow:0 0 14px rgba(120,200,255,.6);}
+  .breathe-sub{color:#bcdcf0;font-size:16px;margin-top:6px;max-width:260px;}
+  .calm-done{margin-top:32px;background:rgba(255,255,255,.16);border:2px solid rgba(191,240,255,.5);
+    border-radius:22px;padding:14px 34px;font-family:'Baloo 2',cursive;font-weight:700;font-size:20px;
+    color:#fff;cursor:pointer;backdrop-filter:blur(4px);}
+  .calm-done:active{transform:translateY(3px);}
+
+  /* gentle answer reveal (never-stuck) */
+  .choice.reveal{background:#fff4cf;border-color:var(--sun-deep);
+    box-shadow:0 5px 0 var(--sun-deep);animation:pop .5s;}
+  .asteroid.hintglow .rock{border-color:#ffe14b;
+    box-shadow:0 0 22px 6px rgba(255,225,75,.85),inset -6px -8px 14px rgba(0,0,0,.5);}
 </style>
 </head>
 <body>
@@ -379,6 +424,9 @@
     <div class="stars">⭐<span id="starCount">0</span></div>
   </div>
 
+  <!-- floating "take a breath" button (only during play) -->
+  <button class="calm-btn hidden" id="calmBtn" onclick="openCalm()" title="Take a breath with Fox">🌬️</button>
+
   <div class="stage hidden" id="stage">
     <div class="fox" id="fox">🦊</div>
     <div class="speech" id="speech">Can you read this word?</div>
@@ -403,6 +451,15 @@
     <div class="reward-stars" id="rewardStars">⭐⭐⭐</div>
     <div class="badge" id="badgeText">Fox made it home! 🏡</div>
     <button class="big-btn" onclick="chooseLevel()">Play Again!</button>
+  </div>
+
+  <!-- CALM CORNER -->
+  <div id="calmScreen">
+    <div style="font-size:40px;margin-bottom:10px;">🦊</div>
+    <div class="breathe-ring" id="breatheRing">🌬️</div>
+    <div class="breathe-word" id="breatheWord">Breathe in…</div>
+    <div class="breathe-sub">Follow Fox. Big slow breaths. Take all the time you want.</div>
+    <button class="calm-done" onclick="closeCalm()">I'm ready 🌈</button>
   </div>
 
   <!-- ================= SPACE MODE ================= -->
@@ -835,12 +892,17 @@ const PHRASES=[
   "run and jump","she can run","he is big","we can go","it is hot","the dog ran"
 ];
 
-const CHEERS=["Woohoo!","Amazing!","You got it!","Super!","Yes!","High five!","Way to go!","Nice reading!","You're a star!","Awesome!"];
-const TRY_AGAIN=["Almost! Try again.","So close! Look again.","Good try! Sound it out.","Hmm, try once more!"];
+/* Effort / process praise — praises what he DID (tried, sounded it out, kept going),
+   not "you're smart". Protects a kid who's scared of being "bad at reading". */
+const CHEERS=["You sounded it out!","You didn't give up!","You worked hard!","Great trying!","You kept going!","Nice sounding out!","You did the hard part!","Way to stick with it!","You read it yourself!","Brave reading, buddy!"];
+const TRY_AGAIN=["Good try! Let's sound it out.","Nice try — look again.","You're thinking hard! Try once more.","Almost! Tap the sounds."];
+/* shown when we gently reveal the answer so he's never stuck (never-stuck rule) */
+const REVEAL=["Here it is — let's read it together.","No worries! Here's the word.","We'll get it next time. Here it is.","Great effort! Here's the word."];
 const ROUNDS=8;
 
 let level="short", pool=[], current=null, roundNum=0, stars=0, locked=false;
 let isSentence=false, currentSentence=null;
+let wrongTries=0, missStreak=0;   // per-round tries + rough-patch counter for the breathing nudge
 
 /* ---------- FLOW ---------- */
 function chooseLevel(){
@@ -857,6 +919,7 @@ function startGame(lvl){
   document.getElementById("trailFill").style.width="0%";
   document.getElementById("topbar").classList.remove("hidden");
   document.getElementById("stage").classList.remove("hidden");
+  document.getElementById("calmBtn").classList.remove("hidden");
   hide("startScreen");hide("levelScreen");hide("rewardScreen");
   // swap word card <-> sentence card visibility
   document.getElementById("wordCard").classList.toggle("hidden",isSentence);
@@ -865,7 +928,8 @@ function startGame(lvl){
 }
 
 function nextRound(){
-  locked=false;
+  locked=false; wrongTries=0;
+  document.getElementById("calmBtn").classList.remove("pulse");
   if(roundNum>=ROUNDS){ return finish(); }
   if(pool.length<4){ pool=shuffle([...WORDS[level]]); }
   current=pool.shift();
@@ -874,8 +938,10 @@ function nextRound(){
   // set word
   const wordEl=document.getElementById("theWord");
   wordEl.textContent=current.w;
-  document.getElementById("soundOut").textContent="";
-  document.getElementById("speech").textContent=pick(["Can you read this word?","What does this say?","Read it out loud!","Which picture matches?"]);
+  // try-first: invite HIM to read before we ever say the word for him
+  document.getElementById("speech").textContent=pick(["Your turn — sound it out!","Can you read this word?","Give it a try! Tap the sounds.","Read it out loud!"]);
+  // show the word broken into tappable sound chips (multisensory scaffold)
+  renderSoundChips(current.sounds);
 
   // build 4 choices (1 correct + 3 distractors, all with emojis)
   const others=shuffle(WORDS[level].filter(x=>x.w!==current.w)).slice(0,3);
@@ -886,17 +952,33 @@ function nextRound(){
     const b=document.createElement("button");
     b.className="choice";
     b.innerHTML=`<span class="emoji">${o.e}</span>${o.w}`;
+    if(o.w===current.w) b.dataset.correct="1";
     b.onclick=()=>answer(b,o);
     box.appendChild(b);
   });
-
-  // auto-speak the word gently on arrival
-  setTimeout(()=>speakWord(),350);
+  // NOTE: we intentionally do NOT auto-say the word — he tries first, help is one tap away.
 }
+
+/* render each sound of the word as a tappable chip; tapping says just that sound */
+function renderSoundChips(parts){
+  const el=document.getElementById("soundOut");
+  el.innerHTML="";
+  if(!parts){ return; }
+  parts.forEach((p,idx)=>{
+    if(idx>0){ const ar=document.createElement("span"); ar.className="chip arrow"; ar.textContent="–"; el.appendChild(ar); }
+    const c=document.createElement("span");
+    c.className="chip";
+    c.textContent=p;
+    c.onclick=()=>{ litChip(c); speak(sayable(p)); };
+    el.appendChild(c);
+  });
+}
+function litChip(c){ c.classList.add("lit"); setTimeout(()=>c.classList.remove("lit"),450); }
 
 /* ---------- SENTENCE ROUND ---------- */
 function nextSentenceRound(){
-  locked=false;
+  locked=false; wrongTries=0;
+  document.getElementById("calmBtn").classList.remove("pulse");
   if(roundNum>=ROUNDS){ return finish(); }
   if(pool.length<1){ pool=shuffle([...SENTENCES]); }
   currentSentence=pool.shift();
@@ -917,6 +999,7 @@ function nextSentenceRound(){
     const b=document.createElement("button");
     b.className="choice";
     b.innerHTML=`<span class="emoji">${o.e}</span>${o.answer}`;
+    if(o.answer===currentSentence.answer) b.dataset.correct="1";
     b.onclick=()=>answerSentence(b,o);
     box.appendChild(b);
   });
@@ -936,7 +1019,7 @@ function renderSentence(filled){
 function answerSentence(btn,opt){
   if(locked) return;
   if(opt.answer===currentSentence.answer){
-    locked=true;
+    locked=true; missStreak=0;
     btn.classList.add("correct");
     stars++;
     document.getElementById("starCount").textContent=stars;
@@ -948,18 +1031,35 @@ function answerSentence(btn,opt){
     speakSentence(true);         // read the finished sentence
     setTimeout(nextSentenceRound,1700);
   }else{
+    wrongTries++;
     btn.classList.add("wrong");
     btn.classList.add("dim");
-    document.getElementById("speech").textContent=pick(TRY_AGAIN);
     speak(opt.answer);           // say the word they tapped so they hear the mismatch
     setTimeout(()=>btn.classList.remove("wrong"),400);
+    if(wrongTries>=2){ revealSentence(); }
+    else { document.getElementById("speech").textContent=pick(TRY_AGAIN); }
   }
+}
+
+/* never-stuck: after 2 tries, gently show the answer so he always ends on a win */
+function revealSentence(){
+  locked=true; missStreak++;
+  const c=document.getElementById("choices").querySelector('[data-correct]');
+  if(c){ c.classList.remove('dim'); c.classList.add('reveal'); }
+  renderSentence(true);
+  document.getElementById("speech").textContent=pick(REVEAL);
+  speakSentence(true);
+  stars++;                       // keep momentum — he engaged and finished the sentence
+  document.getElementById("starCount").textContent=stars;
+  document.getElementById("trailFill").style.width=(roundNum/ROUNDS*100)+"%";
+  maybeOfferBreath();
+  setTimeout(nextSentenceRound,2600);
 }
 
 function answer(btn,opt){
   if(locked) return;
   if(opt.w===current.w){
-    locked=true;
+    locked=true; missStreak=0;
     btn.classList.add("correct");
     stars++;
     document.getElementById("starCount").textContent=stars;
@@ -970,12 +1070,39 @@ function answer(btn,opt){
     speak(current.w);
     setTimeout(nextRound,1400);
   }else{
+    wrongTries++;
     btn.classList.add("wrong");
     btn.classList.add("dim");
-    document.getElementById("speech").textContent=pick(TRY_AGAIN);
-    // nudge: show sounding out to help
-    soundItOut();
     setTimeout(()=>btn.classList.remove("wrong"),400);
+    if(wrongTries>=2){
+      revealWord();              // never-stuck: show it and move on
+    }else{
+      document.getElementById("speech").textContent=pick(TRY_AGAIN);
+      soundItOut();              // first miss: blend it out together to help
+    }
+  }
+}
+
+/* never-stuck: after 2 tries, gently reveal the word so he always ends on a win */
+function revealWord(){
+  locked=true; missStreak++;
+  const c=document.getElementById("choices").querySelector('[data-correct]');
+  if(c){ c.classList.remove('dim'); c.classList.add('reveal'); }
+  document.getElementById("speech").textContent=pick(REVEAL);
+  soundItOut();
+  stars++;                       // keep momentum — he tried hard; end on a win
+  document.getElementById("starCount").textContent=stars;
+  document.getElementById("trailFill").style.width=(roundNum/ROUNDS*100)+"%";
+  maybeOfferBreath();
+  setTimeout(nextRound,2600);
+}
+
+/* if he's hit a rough patch, gently light up the breathing button and offer it */
+function maybeOfferBreath(){
+  if(missStreak>=2){
+    const b=document.getElementById("calmBtn");
+    if(b) b.classList.add("pulse");
+    setTimeout(()=>{ if(locked) document.getElementById("speech").textContent="Want to take a breath with Fox? 🌬️"; },1300);
   }
 }
 
@@ -1012,22 +1139,22 @@ function soundItOut(){
     return;
   }
   const el=document.getElementById("soundOut");
+  const chips=[...el.querySelectorAll('.chip:not(.arrow)')];
   const parts=current.sounds;
-  el.textContent="";
-  // show + say each chunk in sequence
+  // light up each sound chip in turn, say it, then blend the whole word
   let i=0;
-  const show=()=>{
+  const step=()=>{
+    chips.forEach(c=>c.classList.remove('lit'));
     if(i>=parts.length){
-      // then say whole word
-      setTimeout(()=>{ el.textContent=parts.join(" - ")+"  →  "+current.w; speak(current.w); },300);
+      setTimeout(()=>{ flashFox(); speak(current.w); },350);
       return;
     }
-    el.textContent=parts.slice(0,i+1).join(" - ");
+    if(chips[i]) chips[i].classList.add('lit');
     speak(sayable(parts[i]));
     i++;
-    setTimeout(show,650);
+    setTimeout(step,650);
   };
-  show();
+  step();
 }
 
 // make letter-sounds a bit more phonetic for TTS
@@ -1099,6 +1226,7 @@ let spaceStarfieldBuilt=false;
 let emojiOn=true;               // show picture hints in space mode
 let spaceBest=0;                // best streak this session
 let spaceSpeedStreak=0;         // drives speed; grows on correct, eases on miss
+let spaceMissCount=0;           // misses on the current target — guides him after a few
 
 function openSpace(){
   hide("levelScreen");
@@ -1168,6 +1296,7 @@ function toggleEmoji(){
 
 function nextSpaceRound(){
   spaceLocked=false;
+  spaceMissCount=0;
   clearAsteroids();
   if(spacePool.length<4){ spacePool=buildSpacePool(); }
   spaceRound++;
@@ -1288,6 +1417,12 @@ function fireAt(a){
     // wrong pick: flash + shake, gentle nudge, DON'T end the run.
     // ease the speed back down so a rough patch gets easier, not harder.
     spaceSpeedStreak=Math.max(0, spaceSpeedStreak-3);
+    spaceMissCount++;
+    // after a few misses, gently light up the right asteroid so he's never stuck
+    if(spaceMissCount>=3){
+      const good=asteroids.find(x=>x._correct && !x._dead);
+      if(good) good.classList.add('hintglow');
+    }
     a.classList.add('miss');
     setTimeout(()=>a.classList.remove('miss'),400);
     const sp=document.getElementById("spaceSpeech");
@@ -1475,8 +1610,31 @@ function toggleFullscreen(){
 }
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function pick(a){return a[Math.floor(Math.random()*a.length)];}
-function showOnly(id){["startScreen","levelScreen","rewardScreen"].forEach(s=>hide(s));document.getElementById("topbar").classList.add("hidden");document.getElementById("stage").classList.add("hidden");document.getElementById(id).classList.remove("hidden");}
+function showOnly(id){["startScreen","levelScreen","rewardScreen"].forEach(s=>hide(s));document.getElementById("topbar").classList.add("hidden");document.getElementById("stage").classList.add("hidden");document.getElementById("calmBtn").classList.add("hidden");document.getElementById(id).classList.remove("hidden");}
 function hide(id){document.getElementById(id).classList.add("hidden");}
+
+/* ---------- CALM CORNER (breathe with Fox) ---------- */
+let calmTimer=null;
+function openCalm(){
+  const b=document.getElementById("calmBtn"); if(b) b.classList.remove("pulse");
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  document.getElementById("calmScreen").classList.add("show");
+  const word=document.getElementById("breatheWord");
+  let inhale=true;
+  word.textContent="Breathe in…";
+  speak("Let's breathe with Fox. Slow and easy.");
+  clearInterval(calmTimer);
+  // ring animation is an 8s loop: ~4s expanding (in), ~4s shrinking (out)
+  calmTimer=setInterval(()=>{
+    inhale=!inhale;
+    word.textContent = inhale ? "Breathe in…" : "Breathe out…";
+  },4000);
+}
+function closeCalm(){
+  clearInterval(calmTimer); calmTimer=null;
+  document.getElementById("calmScreen").classList.remove("show");
+  speak("Good breathing. Let's keep going.");
+}
 
 // prime speech on first tap (mobile requires user gesture)
 document.body.addEventListener("touchstart",function primer(){
